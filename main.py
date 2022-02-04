@@ -1,6 +1,3 @@
-from crypt import methods
-from distutils.log import debug
-from unittest import result
 from flask import Flask,render_template,request
 from search import search4letters
 
