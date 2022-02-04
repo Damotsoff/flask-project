@@ -14,8 +14,11 @@ def do_search() -> 'html':
     letters =request.form['letters']
     title = 'Here are your result'
     results = str(search4letters(phrase,letters))
-    return render_template('result.html',the_phrase =phrase,the_letters = letters,\
-        the_results =results,the_title =title)
+    return render_template('result.html',
+                            the_phrase =phrase,
+                            the_letters = letters,
+                            the_results =results,
+                            the_title =title)
 
 @app.route('/')
 @app.route('/entry')
