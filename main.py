@@ -5,9 +5,7 @@ from search import search4letters
 app = Flask(__name__)
 
 
-@app.route('/')
-def hello() -> str:
-    return 'Hello world'
+
 
 
 @app.route('/search4',methods=['POST'])
@@ -19,10 +17,10 @@ def do_search() -> 'html':
     return render_template('result.html',the_phrase =phrase,the_letters = letters,\
         the_results =results,the_title =title)
 
-
+@app.route('/')
 @app.route('/entry')
 def entry_page() -> 'html':
     return render_template('entry.html', the_title = 'Welcome to Search Leaters on the Web')
 
-
-app.run(debug=True)
+if __name__=='__main__':
+    app.run(debug=True)
