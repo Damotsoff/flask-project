@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, escape
 from search import search4letters
 from dbcm import UseDatabase
+from cheker import check_logged_in
 
 
 app = Flask(__name__)
@@ -45,6 +46,7 @@ def entry_page() -> 'html':
 
 
 @app.route('/viewlog')
+@check_logged_in
 def view_log() -> 'html':
     contents = []
     with UseDatabase(app.config['dbconfig']) as cursor:
@@ -60,6 +62,7 @@ def view_log() -> 'html':
                            )
 
 
+app.secret_key = 'mysecretKey'
 print('We start off in:', __name__)
 if __name__ == '__main__':
     app.run(debug=True)
