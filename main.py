@@ -31,14 +31,19 @@ def entry_page() -> 'html':
 
 
 @app.route('/viewlog')
-def view_log() -> str:
+def view_log() -> 'html':
     contents = []
     with open('vsearch.log', 'r') as log:
         for line in log:
             contents.append([])
             for item in line.split('|'):
                 contents[-1].append(escape(item))
-    return str(contents)
+    titles = ('Form Data', 'Remote_addr', 'User_agent', 'Results')
+    return render_template('viewlog.html',
+                           the_title='View log',
+                           the_row_titles=titles,
+                           the_data=contents
+                           )
 
 
 print('We start off in:', __name__)
