@@ -1,22 +1,19 @@
 from flask import Flask, render_template, request, escape
 from search import search4letters
-import mysql.connector
+from dbcm import UseDatabase
 
 
 app = Flask(__name__)
-
-
-def log_request(req: 'flask_request', res: str) -> None:
-    with open('vsearch.log', 'a') as log:
-        print(req.form, req.remote_addr, req.user_agent, res, file=log, sep='|')
-        dbconfig = {
-            'host': '127.0.0.1',
+app.config['dbconfig'] = {
+    'host': '127.0.0.1',
             'user': 'vsearch',
             'password': 'vsearchpasswd',
             'database': 'vsearchlogDB'
-        }
-        conn = mysql.connector.connect(**dbconfig)
-        cursor = conn.cursor()
+}
+
+
+def log_request(req: 'flask_request', res: str) -> None:
+    with UseDatabase(app.config['dbconfig']) as cursor:
         _SQL = """insert into log
                     (phrase, letters, ip, browser_string, result)
                     values(%s, %s, %s, %s, %s)"""
@@ -25,9 +22,6 @@ def log_request(req: 'flask_request', res: str) -> None:
                               req.remote_addr,
                               req.user_agent.browser,
                               res, ))
-        conn.commit()
-        cursor.close()
-        conn.close()
 
 
 @app.route('/search4', methods=['POST'])
@@ -53,12 +47,12 @@ def entry_page() -> 'html':
 @app.route('/viewlog')
 def view_log() -> 'html':
     contents = []
-    with open('vsearch.log', 'r') as log:
-        for line in log:
-            contents.append([])
-            for item in line.split('|'):
-                contents[-1].append(escape(item))
-    titles = ('Form Data', 'Remote_addr', 'User_agent', 'Results')
+    with UseDatabase(app.config['dbconfig']) as cursor:
+        _SQL = """select phrase, letters, ip, browser_string, result from log"""
+        cursor.execute(_SQL)
+        contents = cursor.fetchall()
+    titles = ('Phrase', 'Letters',
+              'Remote_addr', 'User_agent', 'Result')
     return render_template('viewlog.html',
                            the_title='View log',
                            the_row_titles=titles,
